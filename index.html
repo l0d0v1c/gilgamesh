@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Gilgamesh — corpus</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Cuneiform&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf7f2; --card:#ffffff; --ink:#2b2620; --muted:#8a8177;
+  --accent:#a05a2c; --accent2:#e8dccb; --cited:#fdf3e3; --border:#e6ded2;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#181512; --card:#221e19; --ink:#e8e2d8; --muted:#9a9084;
+         --accent:#d99a5f; --accent2:#3a322a; --cited:#33291c; --border:#37312a; }
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0; padding:0; background:var(--bg); color:var(--ink);
+  font:16px/1.5 -apple-system, "Segoe UI", Georgia, serif}
+header{position:sticky; top:0; z-index:10; background:var(--bg);
+  padding:calc(env(safe-area-inset-top) + 8px) 12px 8px; border-bottom:1px solid var(--border)}
+h1{font-size:17px; margin:0 0 8px; font-weight:600; letter-spacing:.02em}
+h1 span{color:var(--muted); font-weight:400}
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+select{flex:1; min-width:0; font-size:16px; padding:8px 10px; border-radius:10px;
+  border:1px solid var(--border); background:var(--card); color:var(--ink); appearance:none}
+.chips{display:flex; gap:6px; margin-top:8px}
+.chip{flex:1; text-align:center; font-size:13px; padding:7px 4px; border-radius:10px;
+  border:1px solid var(--border); background:var(--card); color:var(--muted);
+  cursor:pointer; user-select:none; -webkit-user-select:none}
+.chip.on{background:var(--accent); border-color:var(--accent); color:#fff}
+main{padding:10px 12px calc(env(safe-area-inset-bottom) + 76px); max-width:720px; margin:0 auto}
+.stanza{background:var(--card); border:1px solid var(--border); border-radius:12px;
+  margin:10px 0; overflow:hidden}
+.sref{font-size:12px; color:var(--muted); padding:8px 12px 2px}
+.verse{padding:8px 12px; cursor:pointer; border-bottom:1px solid var(--border)}
+.verse:last-child{border-bottom:none}
+.verse.cited{background:var(--cited)}
+.vref{font-size:12px; color:var(--muted); display:flex; justify-content:space-between}
+.vref .star{color:var(--accent); font-size:14px}
+.cun{font-family:"Noto Sans Cuneiform", sans-serif; font-size:22px; line-height:1.7;
+  word-break:break-word; margin:4px 0}
+.akk{font-style:italic; color:var(--muted); margin:2px 0; font-size:15px}
+.fr{margin:2px 0}
+.frl{margin:2px 0; color:var(--accent)}
+.en{color:var(--muted); font-size:14px; margin:2px 0}
+.note{font-size:13px; color:var(--muted); border-left:3px solid var(--accent2);
+  padding-left:8px; margin-top:6px}
+footer{position:fixed; bottom:0; left:0; right:0; z-index:10;
+  display:flex; gap:8px; padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);
+  background:var(--bg); border-top:1px solid var(--border)}
+button{font-size:15px; padding:10px 14px; border-radius:12px; border:1px solid var(--border);
+  background:var(--card); color:var(--ink); cursor:pointer}
+button.primary{background:var(--accent); color:#fff; border-color:var(--accent)}
+#citCount{font-weight:600}
+#pageInfo{flex:1; text-align:center; font-size:13px; color:var(--muted);
+  align-self:center; line-height:1.25}
+#btnPrev,#btnNext{min-width:56px; font-size:18px}
+button:disabled{opacity:.35}
+#panel{position:fixed; inset:0; z-index:20; background:var(--bg); display:none;
+  flex-direction:column; padding:calc(env(safe-area-inset-top) + 10px) 12px 0}
+#panel.open{display:flex}
+#panel .head{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px}
+#panel .list{overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(env(safe-area-inset-bottom) + 90px)}
+.cit{background:var(--card); border:1px solid var(--border); border-radius:12px;
+  padding:10px 12px; margin:8px 0; position:relative}
+.cit .rm{position:absolute; top:6px; right:8px; border:none; background:none;
+  color:var(--muted); font-size:18px; padding:4px}
+#panel .actions{position:fixed; bottom:0; left:0; right:0; display:flex; gap:8px;
+  padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);
+  background:var(--bg); border-top:1px solid var(--border)}
+.toast{position:fixed; left:50%; bottom:100px; transform:translateX(-50%);
+  background:var(--ink); color:var(--bg); padding:8px 16px; border-radius:20px;
+  font-size:14px; opacity:0; transition:opacity .3s; pointer-events:none; z-index:30}
+.toast.show{opacity:.92}
+#loading{text-align:center; color:var(--muted); padding:40px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>Gilgamesh <span>— corpus eBL</span></h1>
+  <div class="row"><select id="src"></select></div>
+  <div class="chips">
+    <div class="chip" data-l="cun">𒀭 cun.</div>
+    <div class="chip" data-l="akk">translit.</div>
+    <div class="chip" data-l="fr">français</div>
+    <div class="chip" data-l="frl">litt.</div>
+    <div class="chip" data-l="en">anglais</div>
+  </div>
+</header>
+<main id="main"><div id="loading">Chargement du corpus…</div></main>
+<footer>
+  <button class="primary" id="btnCit">★ <span id="citCount">0</span></button>
+  <button id="btnPrev">◀</button>
+  <div id="pageInfo"></div>
+  <button id="btnNext">▶</button>
+</footer>
+
+<div id="panel">
+  <div class="head">
+    <h1>Citations</h1>
+    <button id="btnClose">Fermer</button>
+  </div>
+  <div class="list" id="citList"></div>
+  <div class="actions">
+    <button class="primary" id="btnCopy">Copier tout</button>
+    <button id="btnClear">Tout effacer</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const LS = { layers:'gilg.layers', pos:'gilg.pos', cites:'gilg.cites' };
+let DATA = [], BYREF = new Map(), ORDER = [];
+let layers = load(LS.layers, {cun:true, akk:false, fr:true, frl:false, en:false});
+let cites  = new Set(load(LS.cites, []));
+let curRef = null, curPage = 0;
+const PAGE = 4;
+
+function load(k, dflt){ try{ const v = JSON.parse(localStorage.getItem(k)); return v===null||v===undefined ? dflt : v; }catch(e){ return dflt; } }
+function save(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1500); }
+
+function shortRef(r){
+  return r.replace('Standard-Babylonian','SB').replace('Old-Babylonian','OB')
+          .replace('Middle-Babylonian','MB').replace('Neo-Assyrian','NA');
+}
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function nPages(ref){ return Math.ceil(BYREF.get(ref).length / PAGE); }
+
+fetch('corpus.json').then(r=>r.json()).then(data=>{
+  DATA = data;
+  data.forEach((e,i)=>{ e._i = i;
+    if(!BYREF.has(e.reference)){ BYREF.set(e.reference, []); ORDER.push(e.reference); }
+    BYREF.get(e.reference).push(e);
+  });
+  const sel = document.getElementById('src');
+  const groups = [['Standard-Babylonian','Version standard'],['Old-Babylonian','Paléo-babylonien'],
+                  ['Middle-Babylonian','Médio-babylonien'],['Neo-Assyrian','Néo-assyrien']];
+  for(const [pfx, label] of groups){
+    const og = document.createElement('optgroup'); og.label = label;
+    for(const r of ORDER) if(r.startsWith(pfx)){
+      const o = document.createElement('option'); o.value = r; o.textContent = shortRef(r);
+      og.appendChild(o);
+    }
+    sel.appendChild(og);
+  }
+  sel.addEventListener('change', ()=> goto(sel.value, 0));
+  document.querySelectorAll('.chip').forEach(c=>{
+    const l = c.dataset.l;
+    c.classList.toggle('on', !!layers[l]);
+    c.addEventListener('click', ()=>{ layers[l] = !layers[l];
+      c.classList.toggle('on', layers[l]); save(LS.layers, layers); renderPage(); });
+  });
+  // reprise de lecture
+  const pos = load(LS.pos, null);
+  if(pos && BYREF.has(pos.ref)){
+    let page = pos.page;
+    if(page === undefined && pos.idx !== undefined){
+      const k = BYREF.get(pos.ref).findIndex(e=>e._i === pos.idx);
+      page = k >= 0 ? Math.floor(k / PAGE) : 0;
+    }
+    goto(pos.ref, page || 0);
+    toast('Lecture reprise à ' + shortRef(pos.ref));
+  } else {
+    goto(BYREF.has('Standard-Babylonian I') ? 'Standard-Babylonian I' : ORDER[0], 0);
+  }
+  updateCount();
+}).catch(err=>{
+  document.getElementById('loading').innerHTML =
+   'Impossible de charger <code>corpus.json</code>.<br>Servez le dossier par HTTP :<br><code>python3 -m http.server</code>';
+});
+
+function verseHTML(e){
+  const cited = cites.has(e._i) ? ' cited' : '';
+  let h = `<div class="verse${cited}" data-i="${e._i}">`;
+  h += `<div class="vref"><span>${esc(e.vers)}</span>` +
+       (cited ? '<span class="star">★</span>' : '') + `</div>`;
+  if(layers.cun && e.cuneiforme) h += `<div class="cun">${esc(e.cuneiforme)}</div>`;
+  if(layers.akk) h += `<div class="akk">${esc(e.babylonien)}</div>`;
+  if(layers.fr)  h += `<div class="fr">${esc(e.francais)}</div>`;
+  if(layers.frl && e.frlitt) h += `<div class="frl">${esc(e.frlitt)}</div>`;
+  if(layers.en && e.anglais) h += `<div class="en">${esc(e.anglais)}</div>`;
+  if((layers.fr || layers.frl) && e.comment) h += `<div class="note">${esc(e.comment)}</div>`;
+  return h + '</div>';
+}
+
+function goto(ref, page){
+  curRef = ref;
+  curPage = Math.max(0, Math.min(page, nPages(ref) - 1));
+  document.getElementById('src').value = ref;
+  renderPage();
+  save(LS.pos, {ref: curRef, page: curPage});
+  window.scrollTo(0, 0);
+}
+
+function renderPage(){
+  const list = BYREF.get(curRef);
+  const chunk = list.slice(curPage * PAGE, curPage * PAGE + PAGE);
+  const a = chunk[0].vers, b = chunk[chunk.length - 1].vers;
+  let h = `<div class="stanza"><div class="sref">${shortRef(curRef)} ${esc(a)}${chunk.length > 1 ? '–' + esc(b) : ''}</div>`;
+  h += chunk.map(verseHTML).join('') + '</div>';
+  document.getElementById('main').innerHTML = h;
+  document.getElementById('pageInfo').innerHTML =
+    `${shortRef(curRef)}<br>strophe ${curPage + 1} / ${nPages(curRef)}`;
+  const iRef = ORDER.indexOf(curRef);
+  document.getElementById('btnPrev').disabled = (curPage === 0 && iRef === 0);
+  document.getElementById('btnNext').disabled =
+    (curPage === nPages(curRef) - 1 && iRef === ORDER.length - 1);
+}
+
+function step(dir){
+  const iRef = ORDER.indexOf(curRef);
+  if(dir > 0){
+    if(curPage < nPages(curRef) - 1) goto(curRef, curPage + 1);
+    else if(iRef < ORDER.length - 1){ const r = ORDER[iRef + 1]; goto(r, 0); toast(shortRef(r)); }
+  } else {
+    if(curPage > 0) goto(curRef, curPage - 1);
+    else if(iRef > 0){ const r = ORDER[iRef - 1]; goto(r, nPages(r) - 1); toast(shortRef(r)); }
+  }
+}
+document.getElementById('btnPrev').addEventListener('click', ()=>step(-1));
+document.getElementById('btnNext').addEventListener('click', ()=>step(1));
+document.addEventListener('keydown', ev=>{
+  if(ev.key === 'ArrowRight') step(1);
+  if(ev.key === 'ArrowLeft') step(-1);
+});
+// balayage tactile
+let tx = null, ty = null;
+document.getElementById('main').addEventListener('touchstart', ev=>{
+  tx = ev.touches[0].clientX; ty = ev.touches[0].clientY; }, {passive:true});
+document.getElementById('main').addEventListener('touchend', ev=>{
+  if(tx === null) return;
+  const dx = ev.changedTouches[0].clientX - tx, dy = ev.changedTouches[0].clientY - ty;
+  if(Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy)) step(dx < 0 ? 1 : -1);
+  tx = ty = null; }, {passive:true});
+
+document.getElementById('main').addEventListener('click', ev=>{
+  const v = ev.target.closest('.verse'); if(!v) return;
+  const i = +v.dataset.i;
+  if(cites.has(i)){ cites.delete(i); toast('Citation retirée'); }
+  else { cites.add(i); toast('Ajouté aux citations'); }
+  save(LS.cites, [...cites]);
+  v.outerHTML = verseHTML(DATA[i]);
+  updateCount();
+});
+
+function updateCount(){ document.getElementById('citCount').textContent = cites.size; }
+
+// panneau citations
+const panel = document.getElementById('panel');
+document.getElementById('btnCit').addEventListener('click', ()=>{ renderCitations(); panel.classList.add('open'); });
+document.getElementById('btnClose').addEventListener('click', ()=> panel.classList.remove('open'));
+
+function citText(e){
+  const parts = [`${shortRef(e.reference)} ${e.vers}`];
+  if(layers.cun && e.cuneiforme) parts.push(e.cuneiforme);
+  if(layers.akk) parts.push(e.babylonien);
+  if(layers.fr)  parts.push(e.francais);
+  if(layers.frl && e.frlitt) parts.push(e.frlitt);
+  if(layers.en && e.anglais) parts.push(e.anglais);
+  return parts.join('\n');
+}
+function renderCitations(){
+  const list = document.getElementById('citList');
+  const idx = [...cites].sort((a,b)=>a-b);
+  if(!idx.length){ list.innerHTML = '<div id="loading">Aucune citation. Touchez un vers pour l\u2019ajouter.</div>'; return; }
+  list.innerHTML = idx.map(i=>{
+    const e = DATA[i];
+    let h = `<div class="cit"><button class="rm" data-i="${i}">\u2715</button>`;
+    h += `<div class="vref">${shortRef(e.reference)} ${esc(e.vers)}</div>`;
+    if(layers.cun && e.cuneiforme) h += `<div class="cun">${esc(e.cuneiforme)}</div>`;
+    if(layers.akk) h += `<div class="akk">${esc(e.babylonien)}</div>`;
+    if(layers.fr)  h += `<div class="fr">${esc(e.francais)}</div>`;
+    if(layers.frl && e.frlitt) h += `<div class="frl">${esc(e.frlitt)}</div>`;
+    if(layers.en && e.anglais) h += `<div class="en">${esc(e.anglais)}</div>`;
+    return h + '</div>';
+  }).join('');
+}
+document.getElementById('citList').addEventListener('click', ev=>{
+  const b = ev.target.closest('.rm'); if(!b) return;
+  cites.delete(+b.dataset.i); save(LS.cites, [...cites]);
+  renderCitations(); updateCount(); renderPage();
+});
+document.getElementById('btnCopy').addEventListener('click', ()=>{
+  const idx = [...cites].sort((a,b)=>a-b);
+  if(!idx.length){ toast('Aucune citation'); return; }
+  const txt = idx.map(i=>citText(DATA[i])).join('\n\n');
+  (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject())
+    .then(()=>toast('Copié !'))
+    .catch(()=>{ const ta=document.createElement('textarea'); ta.value=txt;
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      ta.remove(); toast('Copié !'); });
+});
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  cites.clear(); save(LS.cites, []); renderCitations(); updateCount(); renderPage();
+});
+</script>
+</body>
+</html>
