@@ -53,3 +53,6 @@ L'étude systématique du corpus (comparaison akkadien / anglais / français) a 
 Le texte akkadien antique appartient, lui, à l'humanité depuis plus de trois mille ans.
 
 > *De la mort et de la vie il me dira le secret.* — SB IX 77
+
+
+[![DOI](https://zenodo.org/badge/1324865212.svg)](https://doi.org/10.5281/zenodo.21819525)
