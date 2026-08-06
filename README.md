@@ -1,5 +1,7 @@
 # L'Épopée de Gilgamesh — corpus multilingue
 
+[![DOI](https://zenodo.org/badge/1324865212.svg)](https://doi.org/10.5281/zenodo.21819525)
+
 **Lecture en ligne : [https://l0d0v1c.github.io/gilgamesh](https://l0d0v1c.github.io/gilgamesh)**
 
 Traduction française intégrale du corpus de l'Épopée de Gilgamesh — les **4 268 vers** des **39 témoins** connus : la version standard en douze tablettes (« *Celui qui a vu l'Abîme* », attribuée à Sîn-lēqi-unninni), les quatorze sources paléo-babyloniennes (~1800 av. J.-C.), les onze fragments médio-babyloniens (Boğazköy, Émar, Megiddo, Ougarit, Nippur, Ur) et les deux fragments néo-assyriens.
@@ -55,4 +57,4 @@ Le texte akkadien antique appartient, lui, à l'humanité depuis plus de trois m
 > *De la mort et de la vie il me dira le secret.* — SB IX 77
 
 
-[![DOI](https://zenodo.org/badge/1324865212.svg)](https://doi.org/10.5281/zenodo.21819525)
+
