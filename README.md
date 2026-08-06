@@ -1,6 +1,6 @@
 # L'Épopée de Gilgamesh — corpus multilingue
 
-[![DOI](https://zenodo.org/badge/1324865212.svg)](https://doi.org/10.5281/zenodo.21819525)
+[![DOI](https://zenodo.org/badge/1324865212.svg?v=2)](https://doi.org/10.5281/zenodo.21819525)
 
 **Lecture en ligne : [https://l0d0v1c.github.io/gilgamesh](https://l0d0v1c.github.io/gilgamesh)**
 
